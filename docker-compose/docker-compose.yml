@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+  config-service:
+    image: config-service:v1
+    ports:
+      - "8888:8888" 
+    restart: always
+    networks: 
+      - spring-cloud
+  eureka-server:
+    image: eureka-server:v1
+    ports:
+      - "8761:8761" 
+    restart: always
+    networks: 
+      - spring-cloud    
+  product-service:
+    image: product-service:v1
+    restart: always
+    networks: 
+      - spring-cloud    
+    depends_on: 
+      - config-service
+      - eureka-server
+  item-service:
+    image: item-service:v1
+    ports: 
+      - "8002:8002"
+      - "8005:8005"
+      - "8007:8007"
+    restart: always    
+    networks: 
+      - spring-cloud    
+    depends_on: 
+      - config-service
+      - eureka-server    
+      - product-service
+  zuul-server:
+    image: zuul-server:v1
+    ports: 
+      - "8090:8090"      
+    restart: always    
+    networks: 
+      - spring-cloud    
+    depends_on: 
+      - config-service
+      - eureka-server    
+      - product-service    
+      - item-service
+networks: 
+  spring-cloud:      
